@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Онлайн-чат</title>
+</head>
+<body>
+
+  <h2>💬 Онлайн-чат</h2>
+  <input id="nickname" placeholder="Ник">
+  <br><br>
+  <div id="chat" style="border:1px solid #000; width:300px; height:200px; overflow-y:auto; padding:5px;"></div>
+  <br>
+  <input id="message" placeholder="Сообщение">
+  <button onclick="sendMessage()">Отправить</button>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script>
+    // 🔹 Вставь сюда свой firebaseConfig
+    const firebaseConfig = {
+      apiKey: "AIzaSyBqxdrLHc_yaJAkWL3oAyNj65JsQuCaFC4",
+      authDomain: "appp-9b246.firebaseapp.com",
+      databaseURL: "https://appp-9b246-default-rtdb.firebaseio.com",
+      projectId: "appp-9b246",
+      storageBucket: "appp-9b246.firebasestorage.app",
+      messagingSenderId: "1084543489385",
+      appId: "1:1084543489385:web:7d7eb4e552a7b8fafbd9f8"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const db = firebase.database();
+
+    function sendMessage() {
+      const name = document.getElementById("nickname").value || "Аноним";
+      const text = document.getElementById("message").value;
+
+      if (text.trim() === "") return;
+
+      db.ref("messages").push({
+        name: name,
+        text: text
+      });
+
+      document.getElementById("message").value = "";
+    }
+
+    // 📡 Слушаем новые сообщения
+    const chat = document.getElementById("chat");
+    db.ref("messages").on("child_added", snapshot => {
+      const msg = snapshot.val();
+      const p = document.createElement("p");
+      p.textContent = msg.name + ": " + msg.text;
+      chat.appendChild(p);
+      chat.scrollTop = chat.scrollHeight;
+    });
+  </script>
+</body>
+</html>
